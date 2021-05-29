@@ -1,0 +1,45 @@
+body {
+    background: linear-gradient(-60deg, #8784ee 50%, rgba(0, 0, 0, 0.4) 30%), url('../img/edit-background.jpg');
+    background-repeat: no-repeat;
+    text-align: center;
+    font-family: 'Open Sans';
+}
+.add-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    transform: translate(-50%, -50%);
+}
+.form-add {
+    font-size: 15px;
+    border: none;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    text-align: center;
+}
+.pure-control-group input, .select{
+    width: 50%;
+}
+.edit {
+    padding: 10px;
+}
+.pure-button {
+    background-color: #8784ee !important;
+    color: white !important;
+}
+.form-title {
+    color: #8784ee;
+    display: inline-block;
+}
+.tick {
+    display: inline;
+    position: relative;
+    float: right;
+    right: 120px;
+    font-size: 10px;
+}
+p {
+    font-size: 10px;
+}

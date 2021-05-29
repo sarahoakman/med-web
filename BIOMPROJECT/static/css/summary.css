@@ -1,0 +1,57 @@
+html{
+    height: 100%;
+    width: 100%;
+}
+body {
+    font-family: 'Open Sans';
+}
+.banner {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(-60deg, #8784ee 35%, rgba(0, 0, 0, 0.4) 30%), url('../img/admin-banner.jpg');
+    background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+}
+.banner-title {
+    color: white;
+    float: right;
+    padding-right: 15%;
+    display: inline;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 45px;
+}
+.pure-button {
+    background-color: #8784ee !important;
+    color: white !important;
+}
+.pure-menu-selected {
+    background-color: #8784ee !important;
+}
+.pure-menu-link:hover {
+    background-color:  #918fe3 !important;
+}
+.graph {
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+h2 {
+    color: #8784ee;
+}
+.tables {
+    text-align: center;
+}
+.pure-table {
+    display: block;
+    position: relative;
+    margin-left: 340px;
+    margin-right: 50px;
+    margin-bottom: 50px;
+    text-align: center;
+}
+table {
+    border: none !important;
+    color: black !important;
+}

@@ -1,0 +1,126 @@
+html{
+    height: 100%;
+    width: 100%;
+}
+body {
+    font-family: 'Open Sans';
+}
+.banner {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(-60deg, #8784ee 35%, rgba(0, 0, 0, 0.4) 30%), url('../img/subject-banner.jpg');
+    background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+}
+.banner-title {
+    color: white;
+    float: right;
+    padding-right: 15%;
+    display: inline;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 45px;
+}
+.search {
+    display: inline;
+    padding-left: 16%;
+    padding-right: 10px;
+}
+.search .fas {
+    width: 31%;
+    position: absolute;
+    padding: 11px;
+    pointer-events: none;
+}
+.search-right .fas {
+    right: 0px;
+}
+.search-right input {
+    width: 55%;
+}
+.add-popup {
+    position: fixed;
+    display: none;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    transform: translate(-50%, -50%);
+}
+.form-add {
+    font-size: 15px;
+    border: none;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    text-align: center;
+}
+.pure-control-group input, .select{
+    width: 50%;
+}
+.edit {
+    padding: 10px;
+}
+.exit {
+    display: inline-block;
+    position: relative;
+    left: 299px;
+    top: -27px;
+}
+.fa-times {
+    color: white;
+}
+.pure-button {
+    background-color: #8784ee !important;
+    color: white !important;
+}
+.form-title {
+    color: #8784ee;
+    display: inline-block;
+}
+.top-bar {
+    position:relative;
+    top: 20px;
+}
+.pure-table {
+    display: block;
+    position: relative;
+    top: 40px;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 13px;
+}
+td {
+    width: 10%;
+}
+ td.edit, th.edit, td.data, th.data {
+    border-left: none !important;
+}
+th.edit, th.data {
+    background-color: white !important;
+}
+table {
+    border: none !important;
+}
+.pure-menu-selected {
+    background-color: #8784ee !important;
+}
+.pure-menu-link:hover {
+    background-color:  #918fe3 !important;
+}
+.tick {
+    display: inline;
+    position: relative;
+    float: right;
+    right: 120px;
+    font-size: 10px;
+}
+p {
+    font-size: 10px;
+}
+span {
+    text-align: center;
+}
