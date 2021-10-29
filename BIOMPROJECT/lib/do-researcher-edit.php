@@ -1,8 +1,8 @@
 <?php 
     session_start();
 
-    $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
-        
+    $conn = new PDO('sqlite:./db/project.sqlite');
+                                
     if (!$conn) {
         exit("Connection Failed: " . $conn); 
     }
@@ -20,9 +20,9 @@
     }
 
     // ensure the username is unique, doesn't already exist
-    $sql = "SELECT * FROM User WHERE User.Username='".$username."'";
-    $rs = odbc_exec($conn,$sql);
-    while(odbc_fetch_row($rs)) {
+    $sql = "SELECT * FROM User WHERE Username='".$username."'";
+    $rs = $conn->query($sql);
+    while($row = $rs->fetch()) {
         $_SESSION["edit-error"] = 1;
         header("Location: admin-researchers.php");
         exit();
@@ -34,41 +34,41 @@
     if (isset($_SESSION["researcher-username"])) {
         if (!empty($_POST['password'])) {
             $password = $_POST['password'];
-            $sql = "UPDATE User SET User.Password='$password' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET Password='$password' WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['firstname'])) {
             $firstname = $_POST['firstname'];
-            $sql = "UPDATE User SET User.FirstName='$firstname' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET FirstName='$firstname' WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['lastname'])) {
             $lastname = $_POST['lastname'];
-            $sql = "UPDATE User SET User.Lastname='$lastname' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET Lastname='$lastname' WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['dob'])) {
             $dob = "#".$_POST["dob"]."#";
-            $sql = "UPDATE User SET User.DOB=$dob WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET DOB=$dob WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['gender'])) {
             $gender = $_POST['gender'];
-            $sql = "UPDATE User SET User.Gender='$gender' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET Gender='$gender' WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['contact'])) {
             $contact = $_POST['contact'];
             if (strlen($contact) == 8) {
                 $contact = '  '.$contact;
             }
-            $sql = "UPDATE User SET User.Contact='$contact' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET Contact='$contact' WHERE Username='".$id."'";
+            $rs = $conn->exec($sql);
         }
         if (!empty($_POST['username'])) {
             $username = $_POST['username'];
-            $sql = "UPDATE User SET User.Username='$username' WHERE User.Username='".$id."'";
-            $rs = odbc_exec($conn,$sql);
+            $sql = "UPDATE User SET Username='$username' WHERE Username='$id'";
+            $rs = $conn->exec($sql);
         }
     }
     unset($_SESSION["researcher-username"]);

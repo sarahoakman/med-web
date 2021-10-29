@@ -24,22 +24,22 @@
             <div class="pure-control-group">
             <?php
                 // creates the list of researchers to assign
-                $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
-                        
+                $conn = new PDO('sqlite:./db/project.sqlite');
+                                
                 if (!$conn) {
                     exit("Connection Failed: " . $conn); 
                 }
                 
-                $sql = "SELECT * FROM User WHERE Admin=0 ORDER BY User.FirstName";
+                $sql = "SELECT * FROM User WHERE Admin='False' ORDER BY User.FirstName";
 
-                $allResearchers = odbc_exec($conn,$sql);
+                $allResearchers = $conn->query($sql);
                 
                 // disables and checks boxes for researchers already assigned
                 // other researchers are selectable, stores them in a list
-                while(odbc_fetch_row($allResearchers)) {
-                    $firstname = odbc_result($allResearchers,'FirstName');
-                    $lastname = odbc_result($allResearchers,'LastName');
-                    $username = odbc_result($allResearchers, 'Username');
+                while($row = $allResearchers->fetch()) {
+                    $firstname = $row['FirstName'];
+                    $lastname = $row['LastName'];
+                    $username = $row['Username'];
                     echo "<div>";
                     if (findResearcher($username) == true) {
                         echo "<input type='checkbox' checked = 'checked' disabled>$firstname $lastname</input>";
@@ -56,19 +56,20 @@
 
                 // checks in the researcher is already assigned
                 function findResearcher($username) {
-                    $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
-                        
+                    $conn = new PDO('sqlite:./db/project.sqlite');
+                                
                     if (!$conn) {
                         exit("Connection Failed: " . $conn); 
                     }
+
                     $id = $_POST["subject-id"];
                     $sql = "SELECT User.FirstName, User.LastName, User.Username, Researcher.Subject_ID
                     FROM [User] INNER JOIN Researcher ON User.Username = Researcher.Researcher
                     WHERE (((Researcher.Subject_ID)='".$id."'))";
 
-                    $alreadyRegistered = odbc_exec($conn,$sql);
-                    while(odbc_fetch_row($alreadyRegistered)) {
-                        if ($username == odbc_result($alreadyRegistered, 'Username')) {
+                    $alreadyRegistered = $conn->query($sql);
+                    while($row = $alreadyRegistered->fetch()) {
+                        if ($username == $row['Username']) {
                             return true;
                         }
                     }

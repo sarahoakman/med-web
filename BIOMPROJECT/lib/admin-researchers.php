@@ -122,16 +122,16 @@
 	</body>
 	<?php 
 		// Use preconfigured Data Source Name to connect to database
-		$conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+		$conn = new PDO('sqlite:./db/project.sqlite');
+                                
+	    if (!$conn) {
+	        exit("Connection Failed: " . $conn); 
+	    }
 			
-		if (!$conn) {
-			exit("Connection Failed: " . $conn); 
-		}
-		
 		// Get all entries from the Subject table
-		$sql = "SELECT * FROM User WHERE Admin=0 ORDER BY User.FirstName";
+		$sql = "SELECT * FROM User WHERE Admin='False' ORDER BY User.FirstName";
 		
-		$rs = odbc_exec($conn,$sql);
+		$rs = $conn->query($sql);
 		echo "<div id=subjects>";
 		echo "<table class='pure-table'>";
 		echo "<thead>";
@@ -145,19 +145,19 @@
         echo "</tr>";
         echo "</thead>";
         echo "<tbody>";
-        while(odbc_fetch_row($rs)) {
-            $username = odbc_result($rs,'Username');
-            $firstName = odbc_result($rs,'FirstName');
-            $lastName = odbc_result($rs,'LastName');
-			$dob = odbc_result($rs,'DOB');
-			$split = explode(' ', $dob);
-			$temp = explode('-', $split[0]);
-			$year = $temp[0];
-			$month = $temp[1];
-			$day =  $temp[2];
-			$dob = $day.'/'.$month.'/'.$year;
-            $gender = odbc_result($rs,'Gender');
-            $contact = odbc_result($rs,'Contact');
+        while($row = $rs->fetch()) {
+            $username = $row['Username'];
+            $firstName = $row['FirstName'];
+	        $lastName = $row['LastName'];
+            $dob = $row['DOB'];
+            $split = explode(' ', $dob);
+            $temp = explode('-', $split[0]);
+            $year = $temp[0];
+            $month = $temp[1];
+            $day =  $temp[2];
+            $dob = $day.'/'.$month.'/'.$year;
+	        $gender = $row['Gender'];
+            $contact = $row['Contact'];
             if (empty($contact)) {
                 $contact = "N/P";
             }

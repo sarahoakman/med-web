@@ -2,11 +2,11 @@
 
 session_start();
 
-$conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
-			
-if (!$conn) {
-	exit("Connection Failed: " . $conn); 
-}
+$conn = new PDO('sqlite:./db/project.sqlite');
+                                
+    if (!$conn) {
+        exit("Connection Failed: " . $conn); 
+    }
 
 // sets the error for non empty inputs
 if (!empty($_POST["username"]) && !empty($_POST["password"])) {
@@ -14,25 +14,23 @@ if (!empty($_POST["username"]) && !empty($_POST["password"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $sql = "SELECT * FROM User WHERE username= '".$username."' AND password='".$password."'";
-    $rs = odbc_exec($conn,$sql);
-    // only enters loop if sql has a result
-    while(odbc_fetch_row($rs)) {
-        // check with case sensitivity 
-        $username_sql = odbc_result($rs,"Username");
-		$password_sql = odbc_result($rs,"Password");
-        if ($username_sql == $username && $password_sql == $password) {
-            $admin = odbc_result($rs, "Admin");
-            unset( $_SESSION["error"] );
-            $_SESSION["username"] = $username;
-            if ($admin == 1) {
-            $_SESSION["type"] = "admin";
-            header("Location: admin.php");
-            } else {
-            $_SESSION["type"] = "researcher";
-            header("Location: researcher.php");
-            }
-            exit();
+    $rs = $conn->query($sql);
+    $check = $rs->fetch();
+    // check with case sensitivity 
+    $username_sql = $check["Username"];
+	$password_sql = $check["Password"];
+    if ($username_sql == $username && $password_sql == $password) {
+        $admin = $check["Admin"];
+        unset( $_SESSION["error"] );
+        $_SESSION["username"] = $username;
+        if ($admin == 'True') {
+        $_SESSION["type"] = "admin";
+        header("Location: admin.php");
+        } else {
+        $_SESSION["type"] = "researcher";
+        header("Location: researcher.php");
         }
+        exit();
     }
     // sets the error for incorrect inputs 
     $_SESSION["error"] = "Incorrect username and/or password";

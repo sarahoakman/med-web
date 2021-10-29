@@ -1,17 +1,18 @@
 <?php
     // gets a dictionary representation of HR, Mean HR, Standard deviation by ages
     function getHRPerAge($test) {
-        $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+        $conn = new PDO('sqlite:./db/project.sqlite');
+                                
         if (!$conn) {
             exit("Connection Failed: " . $conn); 
         }
-        $sql = "SELECT * FROM Activity WHERE ((Activity.Description)='$test')";
-        $rs = odbc_exec($conn,$sql);
+        $sql = "SELECT * FROM Activity WHERE ((Description)='$test')";
+        $rs = $conn->query($sql);
         $aid = array();
         $temp_sid = array();
-        while(odbc_fetch_row($rs)) {
-            array_push($aid, odbc_result($rs,'Activity_ID'));
-            array_push($temp_sid, odbc_result($rs,'Subject_ID'));
+        while($row=$rs->fetch()) {
+            array_push($aid, $row['Activity_ID']);
+            array_push($temp_sid, $row['Subject_ID']);
             
         }
         $sid = array();
@@ -19,21 +20,21 @@
         $j = 0;
         foreach($aid as $a) {
             $i = intval($a);
-            $sql = "SELECT * FROM Physiological_data WHERE (((Physiological_data.VitalSignType)='Heart Rate') AND ((Physiological_data.Activity_ID) =$i))";
-            $rs = odbc_exec($conn,$sql);
-            while(odbc_fetch_row($rs)) {
+            $sql = "SELECT * FROM Physiological_data WHERE (((VitalSignType)='Heart Rate') AND ((Activity_ID) ='$i'))";
+            $rs = $conn->query($sql);
+            while($row = $rs->fetch()) {
                 array_push($sid, $temp_sid[$j]);
-                array_push($hr, odbc_result($rs,'Data'));
+                array_push($hr, $row['Data']);
             }
             $j++;
         }
         
         $age_temp = array();
         foreach($sid as $s) {
-            $sql = "SELECT * FROM Subject WHERE ((Subject.Subject_ID)='$s')";
-            $rs = odbc_exec($conn,$sql);
-            while(odbc_fetch_row($rs)) {
-                $dob = odbc_result($rs,'DOB');
+            $sql = "SELECT * FROM Subject WHERE ((Subject_ID)='$s')";
+            $rs = $conn->query($sql);
+            while($row = $rs->fetch()) {
+                $dob = $row['DOB'];
                 $temp = date_diff(date_create($dob), date_create('now'))->y;
                 array_push($age_temp, $temp);
             }
@@ -53,7 +54,8 @@
 
     function getMeanHR($test) {
         $age = getHRPerAge($test); 
-        $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+        $conn = new PDO('sqlite:./db/project.sqlite');
+                                
         if (!$conn) {
             exit("Connection Failed: " . $conn); 
         }

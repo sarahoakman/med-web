@@ -60,24 +60,25 @@
                 <tr>
                 <?php
                     // print the user details into a table, single row
-                    $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+                    $conn = new PDO('sqlite:./db/project.sqlite');
+                                
                     if (!$conn) {
                         exit("Connection Failed: " . $conn); 
                     }
                     $sql = "SELECT * FROM Subject WHERE Subject.Subject_ID='".$id."'";
-                    $rs = odbc_exec($conn,$sql);
-                    while(odbc_fetch_row($rs)) {
-                        $firstName = odbc_result($rs,'FirstName');
-				        $lastName = odbc_result($rs,'LastName');
-                        $dob = odbc_result($rs,'DOB');
+                    $rs = $conn->query($sql);
+                    while($row = $rs->fetch()) {
+                        $firstName = $row['FirstName'];
+				        $lastName = $row['LastName'];
+                        $dob = $row['DOB'];
                         $split = explode(' ', $dob);
                         $temp = explode('-', $split[0]);
                         $year = $temp[0];
                         $month = $temp[1];
                         $day =  $temp[2];
                         $dob = $day.'/'.$month.'/'.$year;
-				        $gender = odbc_result($rs,'Gender');
-                        $contact = odbc_result($rs,'Contact');
+				        $gender = $row['Gender'];
+                        $contact = $row['Contact'];
                         if (empty($contact)) {
                             $contact = "N/P";
                         }
@@ -113,19 +114,20 @@
     <div id = baseline class = tests>
         <?php
             // gets ecg, ppg, hr, bp info for baseline
-            $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+            $conn = new PDO('sqlite:./db/project.sqlite');
+                                
             if (!$conn) {
                 exit("Connection Failed: " . $conn); 
             }
-            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject RIGHT JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
+            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
             WHERE ((Subject.Subject_ID)='$id') AND ((Activity.Description)='Baseline Supine Rest')";
+            $rs = $conn->query($sql);
 
-            $rs = odbc_exec($conn,$sql);
             $count_a = 0;
-            while(odbc_fetch_row($rs)) {
-                $aid = odbc_result($rs,'Activity_ID');
+            while($row = $rs->fetch()) {
+                $aid = $row['Activity_ID'];
                 $_SESSION["aid"] = $aid;
-                $date = odbc_result($rs,'TestDate');
+                $date = $row['TestDate'];
 				$split = explode(' ', $date);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
@@ -134,20 +136,18 @@
 				$date = $day.'/'.$month.'/'.$year;
                 $count_a++;
             }
-		
 			// get the correct date
-			;
 
             if ($count_a != 0) {
                 echo "<h3>Baseline Supine Test</h3>";
 
                 $sql_e = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='ECG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='ECG')";
 
                 $count_e = 0;
-                $rs = odbc_exec($conn,$sql_e);
-                while(odbc_fetch_row($rs)) {
-                    $ecg_data = odbc_result($rs,'Data');
+                $rs = $conn->query($sql_e);
+                while($row = $rs->fetch()) {
+                    $ecg_data = $row['Data'];
                     $count_e++;
                 }
 
@@ -156,12 +156,12 @@
                 }
 
                 $sql_p = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='PPG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='PPG')";
 
-                $rs = odbc_exec($conn,$sql_p);
+                $rs = $conn->query($sql_p);
                 $count_p = 0;
-                while(odbc_fetch_row($rs)) {
-                    $ppg_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $ppg_data = $row['Data'];
                     $count_p++;
                 }
 
@@ -170,12 +170,12 @@
                 }
 
                 $sql_h = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Heart Rate')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Heart Rate')";
 
-                $rs = odbc_exec($conn,$sql_h);
+                $rs = $conn->query($sql_h);
                 $count_h = 0;
-                while(odbc_fetch_row($rs)) {
-                    $h_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $h_data = $row['Data'];
                     $count_h++;
                 }
 
@@ -184,12 +184,12 @@
                 }
 
                 $sql_b = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Blood Pressure')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Blood Pressure')";
 
-                $rs = odbc_exec($conn,$sql_b);
+                $rs = $conn->query($sql_b);
                 $count_b = 0;
-                while(odbc_fetch_row($rs)) {
-                    $b_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $b_data = $row['Data'];
                     $count_b++;
                 }
 
@@ -207,22 +207,23 @@
         ?>
     </div>
 
-    <div id = headtilt class = tests>
+    <div id=headtilt class = tests>
         <?php
             // gets ecg, ppg, hr, bp info for head tilt
-            $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+            $conn = new PDO('sqlite:./db/project.sqlite');
+                                
             if (!$conn) {
                 exit("Connection Failed: " . $conn); 
             }
-            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject RIGHT JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
+            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
             WHERE ((Subject.Subject_ID)='$id') AND ((Activity.Description)='Head-up Tilt Test')";
 
-            $rs = odbc_exec($conn,$sql);
+            $rs = $conn->query($sql);
             $count_a = 0;
-            while(odbc_fetch_row($rs)) {
-                $aid = odbc_result($rs,'Activity_ID');
+            while($row = $rs->fetch()) {
+                $aid = $row['Activity_ID'];
                 $_SESSION["aid"] = $aid;
-                $date = odbc_result($rs,'TestDate');
+                $date = $row['TestDate'];
 				$split = explode(' ', $date);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
@@ -235,12 +236,12 @@
             if ($count_a != 0) {
                 echo "<h3>Head-up Tilt Test</h3>";
                 $sql_e = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='ECG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='ECG')";
 
                 $count_e = 0;
-                $rs = odbc_exec($conn,$sql_e);
-                while(odbc_fetch_row($rs)) {
-                    $ecg_data = odbc_result($rs,'Data');
+                $rs = $conn->query($sql_e);
+                while($row = $rs->fetch()) {
+                    $ecg_data = $row['Data'];
                     $count_e++;
                 }
 
@@ -249,12 +250,12 @@
                 }
 
                 $sql_p = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='PPG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='PPG')";
 
-                $rs = odbc_exec($conn,$sql_p);
+                $rs = $conn->query($sql_p);
                 $count_p = 0;
-                while(odbc_fetch_row($rs)) {
-                    $ppg_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $ppg_data = $row['Data'];
                     $count_p++;
                 }
 
@@ -263,12 +264,12 @@
                 }
 
                 $sql_h = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Heart Rate')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Heart Rate')";
 
-                $rs = odbc_exec($conn,$sql_h);
+                $rs = $conn->query($sql_h);
                 $count_h = 0;
-                while(odbc_fetch_row($rs)) {
-                    $h_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $h_data = $row['Data'];
                     $count_h++;
                 }
 
@@ -277,12 +278,12 @@
                 }
 
                 $sql_b = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Blood Pressure')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Blood Pressure')";
 
-                $rs = odbc_exec($conn,$sql_b);
+                $rs = $conn->query($sql_b);
                 $count_b = 0;
-                while(odbc_fetch_row($rs)) {
-                    $b_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $b_data = $row['Data'];
                     $count_b++;
                 }
 
@@ -304,19 +305,20 @@
     <div id = suction1 class = tests>
         <?php
             // gets ecg, ppg, hr, bp info for suction test 1
-            $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+            $conn = new PDO('sqlite:./db/project.sqlite');
+                                
             if (!$conn) {
                 exit("Connection Failed: " . $conn); 
             }
-            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject RIGHT JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
+            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
             WHERE ((Subject.Subject_ID)='$id') AND ((Activity.Description)='Suction Test: Level 1')";
 
-            $rs = odbc_exec($conn,$sql);
+            $rs = $conn->query($sql);
             $count_a = 0;
-            while(odbc_fetch_row($rs)) {
-                $aid = odbc_result($rs,'Activity_ID');
+            while($row = $rs->fetch()) {
+                $aid = $row['Activity_ID'];
                 $_SESSION["aid"] = $aid;
-                $date = odbc_result($rs,'TestDate');
+                $date = $row['TestDate'];
 				$split = explode(' ', $date);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
@@ -330,12 +332,12 @@
             if ($count_a != 0) {
                 echo "<h3>Suction Test Level 1</h3>";
                 $sql_e = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='ECG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='ECG')";
 
                 $count_e = 0;
-                $rs = odbc_exec($conn,$sql_e);
-                while(odbc_fetch_row($rs)) {
-                    $ecg_data = odbc_result($rs,'Data');
+                $rs = $conn->query($sql_e);
+                while($row = $rs->fetch()) {
+                    $ecg_data = $row['Data'];
                     $count_e++;
                 }
 
@@ -344,12 +346,12 @@
                 }
 
                 $sql_p = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='PPG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='PPG')";
 
-                $rs = odbc_exec($conn,$sql_p);
+                $rs = $conn->query($sql_p);
                 $count_p = 0;
-                while(odbc_fetch_row($rs)) {
-                    $ppg_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $ppg_data = $row['Data'];
                     $count_p++;
                 }
 
@@ -358,12 +360,12 @@
                 }
 
                 $sql_h = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Heart Rate')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Heart Rate')";
 
-                $rs = odbc_exec($conn,$sql_h);
+                $rs = $conn->query($sql_h);
                 $count_h = 0;
-                while(odbc_fetch_row($rs)) {
-                    $h_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $h_data = $row['Data'];
                     $count_h++;
                 }
 
@@ -372,12 +374,12 @@
                 }
 
                 $sql_b = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Blood Pressure')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Blood Pressure')";
 
-                $rs = odbc_exec($conn,$sql_b);
+                $rs = $conn->query($sql_b);
                 $count_b = 0;
-                while(odbc_fetch_row($rs)) {
-                    $b_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $b_data = $row['Data'];
                     $count_b++;
                 } 
 				if ($count_b == 0) {
@@ -400,19 +402,20 @@
     <div id = suction2 class = tests>
         <?php
             // gets ecg, ppg, hr, bp info for baseline
-            $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
+            $conn = new PDO('sqlite:./db/project.sqlite');
+                                
             if (!$conn) {
                 exit("Connection Failed: " . $conn); 
             }
-            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject RIGHT JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
+            $sql = "SELECT Activity.Activity_ID, Activity.TestDate FROM (Subject JOIN Activity ON Subject.Subject_ID = Activity.Subject_ID) 
             WHERE ((Subject.Subject_ID)='$id') AND ((Activity.Description)='Suction Test: Level 2')";
         
-            $rs = odbc_exec($conn,$sql);
+            $rs = $conn->query($sql);
             $count_a = 0;
-            while(odbc_fetch_row($rs)) {
-                $aid = odbc_result($rs,'Activity_ID');
+            while($row = $rs->fetch()) {
+                $aid = $row['Activity_ID'];
                 $_SESSION["aid"] = $aid;
-                $date = odbc_result($rs,'TestDate');
+                $date = $row['TestDate'];
 				$split = explode(' ', $date);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
@@ -425,12 +428,12 @@
             if ($count_a != 0) {
                 echo "<h3>Suction Test Level 2</h3>";
                 $sql_e = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='ECG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='ECG')";
 
                 $count_e = 0;
-                $rs = odbc_exec($conn,$sql_e);
-                while(odbc_fetch_row($rs)) {
-                    $ecg_data = odbc_result($rs,'Data');
+                $rs = $conn->query($sql_e);
+                while($row = $rs->fetch()) {
+                    $ecg_data = $row['Data'];
                     $count_e++;
                 }
 
@@ -439,12 +442,12 @@
                 }
 
                 $sql_p = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='PPG')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='PPG')";
 
-                $rs = odbc_exec($conn,$sql_p);
+                $rs = $conn->query($sql_p);
                 $count_p = 0;
-                while(odbc_fetch_row($rs)) {
-                    $ppg_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $ppg_data = $row['Data'];
                     $count_p++;
                 }
 
@@ -453,12 +456,12 @@
                 }
 
                 $sql_h = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Heart Rate')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Heart Rate')";
 
-                $rs = odbc_exec($conn,$sql_h);
+                $rs = $conn->query($sql_h);
                 $count_h = 0;
-                while(odbc_fetch_row($rs)) {
-                    $h_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $h_data = $row['Data'];
                     $count_h++;
                 }
 
@@ -467,12 +470,12 @@
                 }
 
                 $sql_b = "SELECT * FROM Physiological_data
-                WHERE ((Physiological_data.Activity_ID)=$aid) AND ((Physiological_data.VitalSignType)='Blood Pressure')";
+                WHERE ((Physiological_data.Activity_ID)='$aid') AND ((Physiological_data.VitalSignType)='Blood Pressure')";
 				
-                $rs = odbc_exec($conn,$sql_b);
+                $rs = $conn->query($sql_b);
                 $count_b = 0;
-                while(odbc_fetch_row($rs)) {
-                    $b_data = odbc_result($rs,'Data');
+                while($row = $rs->fetch()) {
+                    $b_data = $row['Data'];
                     $count_b++;
                 }
 				if ($count_b == 0) {

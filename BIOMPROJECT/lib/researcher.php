@@ -80,11 +80,11 @@
 		
 	</body>
 	<?php
-		 $conn = odbc_connect('z5206178', '', '',SQL_CUR_USE_ODBC);
-        
-		 if (!$conn) {
-			 exit("Connection Failed: " . $conn); 
-		 }
+		$conn = new PDO('sqlite:./db/project.sqlite');
+                                
+        if (!$conn) {
+            exit("Connection Failed: " . $conn); 
+        }
 		 // checks if subject was edited
 		if (isset($_SESSION["subject-edit"]) && $_SESSION["subject-edit"] == 1) {
 			unset($_SESSION["subject-edit"]);
@@ -96,7 +96,7 @@
 		FROM Subject INNER JOIN ([User] INNER JOIN Researcher ON User.Username = Researcher.Researcher) ON Subject.Subject_ID = Researcher.Subject_ID
 		WHERE User.Username = '".$username."' ORDER BY Subject.FirstName";
 		
-		$rs = odbc_exec($conn,$sql);
+		$rs = $conn->query($sql);
 
 		// filters according to search
 		if (isset($_SESSION["search"]) && $_SESSION["search"] !== "") {
@@ -116,19 +116,19 @@
 			echo "</tr>";
 			echo "</thead>";
 			echo "<tbody>";
-			while(odbc_fetch_row($rs)) {
-				$id = odbc_result($rs,'Subject_ID');
-				$firstName = odbc_result($rs,'FirstName');
-				$lastName = odbc_result($rs,'LastName');
-				$dob = odbc_result($rs,'DOB');
+			while($row = $rs->fetch()) {
+				$id = $row['Subject_ID'];
+				$firstName = $row['FirstName'];
+				$lastName = $row['LastName'];
+				$dob = $row['DOB'];
 				$split = explode(' ', $dob);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
 				$month = $temp[1];
 				$day =  $temp[2];
 				$dob = $day.'/'.$month.'/'.$year;
-				$gender = odbc_result($rs,'Gender');
-				$contact = odbc_result($rs,'Contact');
+				$gender = $row['Gender'];
+				$contact = $row['Contact'];
 				if (strpos(strtolower($firstName), $search) !== false || 
 					strpos(strtolower($lastName), $search) !== false ||
 					strpos(strtolower($dob), $search) !== false || 
@@ -179,19 +179,19 @@
 			echo "</tr>";
 			echo "</thead>";
 			echo "<tbody>";
-			while(odbc_fetch_row($rs)) {
-				$id = odbc_result($rs,'Subject_ID');
-				$firstName = odbc_result($rs,'FirstName');
-				$lastName = odbc_result($rs,'LastName');
-				$dob = odbc_result($rs,'DOB');
+			while($row = $rs->fetch()) {
+				$id = $row['Subject_ID'];
+				$firstName = $row['FirstName'];
+				$lastName = $row['LastName'];
+				$dob = $row['DOB'];
 				$split = explode(' ', $dob);
 				$temp = explode('-', $split[0]);
 				$year = $temp[0];
 				$month = $temp[1];
 				$day =  $temp[2];
 				$dob = $day.'/'.$month.'/'.$year;
-				$gender = odbc_result($rs,'Gender');
-				$contact = odbc_result($rs,'Contact');
+				$gender = $row['Gender'];
+				$contact = $row['Contact'];
 				if (empty($contact)) {
 					$contact = "N/P";
 				}
